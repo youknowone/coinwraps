@@ -21,4 +21,4 @@ class Currency(CurrencyImplBase, api=API):
 
     def last(self):
         r = self.api.ticker(self.pair[0])
-        return r['last']
+        return float(r['last'])
