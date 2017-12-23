@@ -15,15 +15,14 @@ class Bithumb(APIBase, name='bithumb'):
 
 class BithumbCurrency(CurrencyImplBase, api=Bithumb):
 
-    def __init__(self, pair):
+    def __init__(self, api, pair):
         c1, c2 = pair
         assert c2 == 'KRW'
-        super().__init__(pair)
+        super().__init__(api, pair)
 
     def last(self):
         r = self.api.ticker(self.pair[0])
         data = r['data']
         p = (float(data['buy_price']) + float(data['sell_price'])) / 2
         return p
-
 

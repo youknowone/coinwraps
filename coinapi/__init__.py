@@ -1,7 +1,5 @@
 from coinapi.base import CurrencyPair
 import coinapi.bithumb  # noqa
+import coinapi.coinone  # noqa
 
-
-def create_pair(c1, c2):
-    pair = CurrencyPair((c1, c2))
-    return pair
+__all__ = 'CurrencyPair',

@@ -28,16 +28,16 @@ class APIBase:
         self.session = requests.Session()
 
     def currency(self, pair):
-        return self.currency_impl(pair)
+        return self.currency_impl(self, pair)
 
 
 class CurrencyImplBase:
 
     def __init_subclass__(cls, api):
-        cls.api = api()
         api.currency_impl = cls
 
-    def __init__(self, pair):
+    def __init__(self, api, pair):
+        self.api = api
         self.pair = pair
 
 
