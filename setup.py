@@ -4,7 +4,7 @@ from setuptools import setup
 
 
 def get_version():
-    return '0.0.2'
+    return '0.0.3'
 
 
 tests_require = [
@@ -32,6 +32,7 @@ setup(
     install_requires=[
         'attrs',
         'requests',
+        'ring==0.6.0',
     ],
     tests_require=tests_require,
     extras_require={

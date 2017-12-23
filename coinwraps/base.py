@@ -1,5 +1,7 @@
 from typing import Tuple, Dict
+import time
 import requests
+import logging
 
 
 class RegistryBase:
@@ -22,10 +24,26 @@ class APIBase:
 
     def __init_subclass__(cls, name, **kwargs):
         cls.name = name
-        cls.registry.register(name, cls())
+        cls.shared_api = cls()
+        cls.registry.register(name, cls.shared_api)
 
     def __init__(self):
         self.session = requests.Session()
+        original_request = self.session.request
+        last_time = 0.0
+
+        def safe_request(*args, **kwargs):
+            nonlocal last_time
+            now = time.time()
+            if now - last_time < 1.0:
+                sleep_time = 1 - (now - last_time)
+                logging.warning(f'sleep {sleep_time} to prevent attack')
+                time.sleep(sleep_time)
+            last_time = time.time()
+            response = original_request(*args, **kwargs)
+            return response
+
+        self.session.request = safe_request
 
     def currency(self, pair):
         return self.currency_impl(self, pair)
