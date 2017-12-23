@@ -1,7 +1,7 @@
 from .base import APIBase, CurrencyImplBase
 
 
-class Coinone(APIBase, name='coinone'):
+class API(APIBase, name='coinone'):
 
     URL_PREFIX = 'https://api.coinone.co.kr'
     TICKER_URL = f'{URL_PREFIX}/ticker/'
@@ -12,7 +12,7 @@ class Coinone(APIBase, name='coinone'):
         return response.json()
 
 
-class Currency(CurrencyImplBase, api=Coinone):
+class Currency(CurrencyImplBase, api=API):
 
     def __init__(self, api, pair):
         c1, c2 = pair

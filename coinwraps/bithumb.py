@@ -2,7 +2,7 @@
 from .base import APIBase, CurrencyImplBase
 
 
-class Bithumb(APIBase, name='bithumb'):
+class API(APIBase, name='bithumb'):
 
     URL_PREFIX = 'https://api.bithumb.com'
     TICKER_URL = (URL_PREFIX + '/public/ticker/{currency}').format
@@ -13,7 +13,7 @@ class Bithumb(APIBase, name='bithumb'):
         return response.json()
 
 
-class BithumbCurrency(CurrencyImplBase, api=Bithumb):
+class Currency(CurrencyImplBase, api=API):
 
     def __init__(self, api, pair):
         c1, c2 = pair

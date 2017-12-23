@@ -16,18 +16,18 @@ dev_require = tests_require
 
 
 setup(
-    name='coinapi',
+    name='coinwraps',
     version=get_version(),
-    description='coinapi',
+    description='coinwraps',
     long_description='',
     author='Jeong YunWon',
-    author_email='coinapi@youknowone.org',
-    url='https://github.com/youknowone/coinapi',
+    author_email='coinwraps@youknowone.org',
+    url='https://github.com/youknowone/coinwraps',
     packages=(
-        'coinapi',
+        'coinwraps',
     ),
     package_data={
-        'coinapi': [],
+        'coinwraps': [],
     },
     install_requires=[
         'attrs',
@@ -43,7 +43,6 @@ setup(
         'Operating System :: OS Independent',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
 )  # noqa
