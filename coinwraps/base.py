@@ -1,5 +1,7 @@
 from typing import Tuple, Dict
+import time
 import requests
+import logging
 
 
 class RegistryBase:
@@ -16,29 +18,56 @@ class RegistryBase:
         return self.registrations[key]
 
 
-class APIBase:
+class ClientBase:
     registry = RegistryBase()
     name: str
 
     def __init_subclass__(cls, name, **kwargs):
         cls.name = name
-        cls.registry.register(name, cls())
-
-    def __init__(self):
-        self.session = requests.Session()
+        cls.shared = cls()
+        cls.registry.register(name, cls.shared)
 
     def currency(self, pair):
         return self.currency_impl(self, pair)
 
 
+class APIBase:
+
+    def __init_subclass__(cls, client):
+        client.api = cls(client)
+
+    def __init__(self, client):
+        self.client = client
+        self.session = requests.Session()
+        original_request = self.session.request
+        last_time = 0.0
+
+        def safe_request(*args, **kwargs):
+            nonlocal last_time
+            now = time.time()
+            if now - last_time < 1.0:
+                sleep_time = 1 - (now - last_time)
+                logging.warning(f'sleep {sleep_time} to prevent attack')
+                time.sleep(sleep_time)
+            last_time = time.time()
+            response = original_request(*args, **kwargs)
+            return response
+
+        self.session.request = safe_request
+
+
 class CurrencyImplBase:
 
-    def __init_subclass__(cls, api):
-        api.currency_impl = cls
+    def __init_subclass__(cls, client):
+        client.currency_impl = cls
 
-    def __init__(self, api, pair):
-        self.api = api
+    def __init__(self, client, pair):
+        self.client = client
         self.pair = pair
+
+    @property
+    def api(self):
+        return self.client.api
 
 
 class CurrencyPair:
@@ -49,5 +78,5 @@ class CurrencyPair:
         self.pair = c1, c2
 
     def exchange(self, name):
-        api = APIBase.registry.get(name)
-        return api.currency(self.pair)
+        client = ClientBase.registry.get(name)
+        return client.currency(self.pair)

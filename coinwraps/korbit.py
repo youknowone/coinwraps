@@ -2,26 +2,24 @@ from .base import ClientBase, APIBase, CurrencyImplBase
 import ring
 
 
-class Client(ClientBase, name='coinone'):
+class Client(ClientBase, name='korbit'):
     pass
 
 
 class API(APIBase, client=Client):
 
-    URL_PREFIX = 'https://api.coinone.co.kr'
-    TICKER_URL = f'{URL_PREFIX}/ticker/'
+    URL_PREFIX = 'https://api.korbit.co.kr'
+    TICKER_URL = f'{URL_PREFIX}/v1/ticker/detailed'
 
     def __ring_key__(self):
-        return 'coinone'
+        return 'korbit'
 
     @ring.func.dict({}, expire=5)
     def ticker(self, currency):
         url = self.TICKER_URL
-        response = self.session.get(url, params={'currency': currency})
+        response = self.session.get(
+            url, params={'currency_pair': f'{currency.lower()}_krw'})
         parsed_data = response.json()
-        if currency.lower() == 'all':
-            for code, row in parsed_data.items():
-                self.ticker.set(row, code)
         return parsed_data
 
 
