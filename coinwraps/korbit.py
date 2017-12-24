@@ -1,4 +1,6 @@
+import json
 from .base import APIBase, CurrencyImplBase
+import aiohttp
 import ring
 
 
@@ -10,13 +12,14 @@ class API(APIBase, name='korbit'):
     def __ring_key__(self):
         return 'korbit'
 
-    @ring.func.dict({}, expire=5)
-    def ticker(self, currency):
+    @ring.func_asyncio.dict({}, expire=5)
+    async def ticker(self, currency):
         url = self.TICKER_URL
-        response = self.session.get(
-            url, params={'currency_pair': f'{currency.lower()}_krw'})
-        parsed_data = response.json()
-        return parsed_data
+        async with self.aiohttp_session as session:
+            response = await session.get(
+                url, params={'currency_pair': f'{currency.lower()}_krw'})
+        plain_data = await response.text()
+        return json.loads(plain_data)
 
 
 class Currency(CurrencyImplBase, api=API):
@@ -26,6 +29,6 @@ class Currency(CurrencyImplBase, api=API):
         assert c2 == 'KRW'
         super().__init__(api, pair)
 
-    def last(self):
-        r = self.api.ticker(self.pair[0].lower())
+    async def last(self):
+        r = await self.api.ticker(self.pair[0].lower())
         return float(r['last'])

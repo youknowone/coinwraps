@@ -1,6 +1,7 @@
 from typing import Tuple, Dict
 import time
-import requests
+import asyncio
+import aiohttp
 import logging
 
 
@@ -10,12 +11,23 @@ class RegistryBase:
 
     def __init__(self):
         self.registrations = {}
+        self.async_registrations = {}
 
-    def register(self, key, value):
-        self.registrations[key] = value
+    def register(self, key, value, use_asyncio=False):
+        if use_asyncio:
+            registrations = self.registrations
+        else:
+            registrations = self.async_registrations
+        registrations[key] = value
 
     def get(self, key):
         return self.registrations[key]
+
+    async def asyncio_register_all(self):
+        assert self.async_registrations
+        for name, register in self.async_registrations:
+            self.registrations[name] = await register()
+        self.async_registrations = None  # finalize
 
 
 class APIBase:
@@ -24,23 +36,28 @@ class APIBase:
 
     def __init_subclass__(cls, name, **kwargs):
         cls.name = name
-        cls.shared_api = cls()
-        cls.registry.register(name, cls.shared_api)
 
-    def __init__(self):
-        self.session = requests.Session()
-        original_request = self.session.request
+        async def register(registry):
+            cls.shared_api = cls()
+            await cls.shared_api.init()
+            return cls.shared_api
+
+        cls.registry.register(name, register, use_asyncio=True)
+
+    async def init(self):
+        self.aiohttp_session = aiohttp.ClientSession()
         last_time = 0.0
+        original_request = self.aiohttp_session.request
 
-        def safe_request(*args, **kwargs):
+        async def safe_request(*args, **kwargs):
             nonlocal last_time
             now = time.time()
             if now - last_time < 1.0:
                 sleep_time = 1 - (now - last_time)
                 logging.warning(f'sleep {sleep_time} to prevent attack')
-                time.sleep(sleep_time)
+                asyncio.sleep(sleep_time)
             last_time = time.time()
-            response = original_request(*args, **kwargs)
+            response = await original_request(*args, **kwargs)
             return response
 
         self.session.request = safe_request

@@ -8,9 +8,11 @@ import pytest
     'coinone',
     'korbit',
 ])
-def test_krw_ticker(api_name):
+@pytest.mark.asyncio
+async def test_ticker(api_name):
     api = getattr(coinwraps, f'{api_name}_api')
-    assert api.ticker('eth')
+    ticker = await api.ticker('eth')
+    assert ticker
 
 
 @pytest.mark.parametrize('api_name', [
@@ -19,6 +21,8 @@ def test_krw_ticker(api_name):
     'korbit',
     'upbit',
 ])
-def test_last(api_name):
+@pytest.mark.asyncio
+async def test_last(api_name):
     api = getattr(coinwraps, f'{api_name}_api')
-    assert api.currency(('BTC', 'KRW')).last()
+    price = await api.currency(('BTC', 'KRW')).last()
+    assert isinstance(price, float)

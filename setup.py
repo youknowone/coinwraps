@@ -4,11 +4,12 @@ from setuptools import setup
 
 
 def get_version():
-    return '0.0.3'
+    return '0.0.4'
 
 
 tests_require = [
-    'pytest>=3.0.2', 'pytest-cov', 'pytest-lazy-fixture', 'mock', 'patch',
+    'pytest>=3.0.2', 'pytest-asyncio', 'pytest-cov', 'pytest-lazy-fixture',
+    'mock', 'patch',
     'requests',
 ]
 
