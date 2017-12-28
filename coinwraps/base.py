@@ -27,6 +27,9 @@ class ClientBase:
         cls.shared = cls()
         cls.registry.register(name, cls.shared)
 
+    def __repr__(self):
+        return '{self.__class__.__name__}(name={self.name})'
+
     def currency(self, pair):
         return self.currency_impl(self, pair)
 
@@ -47,7 +50,7 @@ class APIBase:
             now = time.time()
             if now - last_time < 1.0:
                 sleep_time = 1 - (now - last_time)
-                logging.warning(f'sleep {sleep_time} to prevent attack')
+                logging.warning(f'sleep {sleep_time} to prevent attack to {client}')
                 time.sleep(sleep_time)
             last_time = time.time()
             response = original_request(*args, **kwargs)

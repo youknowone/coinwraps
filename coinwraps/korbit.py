@@ -30,6 +30,18 @@ class Currency(CurrencyImplBase, client=Client):
         assert c2 == 'KRW'
         super().__init__(api, pair)
 
+    @property
+    def _currency(self):
+        return self.pair[0].lower()
+
     def last(self):
-        r = self.api.ticker(self.pair[0].lower())
+        r = self.api.ticker(self._currency)
         return float(r['last'])
+
+    def ask(self):
+        r = self.api.ticker(self._currency)
+        return float(r['ask'])
+
+    def bid(self):
+        r = self.api.ticker(self._currency)
+        return float(r['bid'])

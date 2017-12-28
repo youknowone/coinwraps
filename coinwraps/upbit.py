@@ -1,5 +1,4 @@
 import ring
-import logging
 from .base import ClientBase, APIBase, CurrencyImplBase
 
 
@@ -50,3 +49,11 @@ class Currency(CurrencyImplBase, client=Client):
             to_currency=self.pair[1], from_currency=self.pair[0])
         r = self.api.recent(code)
         return r['tradePrice']
+
+    def ask(self):
+        # no ask
+        return self.last()
+
+    def bid(self):
+        # no bid
+        return self.last()
