@@ -43,8 +43,8 @@ class Currency(CurrencyImplBase, client=Client):
 
     def bid(self):
         data = self.api.ticker(self._currency)
-        return float(data['sell_price'])
+        return float(data['buy_price'])
 
     def ask(self):
         data = self.api.ticker(self._currency)
-        return float(data['buy_price'])
+        return float(data['sell_price'])
