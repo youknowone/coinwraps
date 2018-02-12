@@ -16,6 +16,7 @@ def test_krw_ticker(client_name):
 @pytest.mark.parametrize('client_name', [
     'upbit',
     'bittrex',
+    'poloniex',
 ])
 def test_btc_last(client_name):
     client = coinwraps.clients[client_name]
@@ -38,4 +39,17 @@ def test_last(client_name):
 
 def test_upbit():
     client = coinwraps.clients['upbit']
-    assert client.currency(('DOGE', 'BTC')).last()
+    assert client.currency(('LTC', 'BTC')).last()
+
+
+@pytest.mark.parametrize('client_name', [
+    'poloniex',
+    'bittrex',
+])
+def test_orderbook(client_name):
+    client = coinwraps.clients[client_name]
+    orderbook = client.currency(('LTC', 'BTC')).orderbook()
+    ask = orderbook.asks[0]
+    bid = orderbook.bids[0]
+    assert ask[0] > bid[0]
+

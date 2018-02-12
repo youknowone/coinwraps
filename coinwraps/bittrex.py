@@ -1,4 +1,6 @@
 from .base import ClientBase, APIBase, CurrencyImplBase
+from .typing import Orderbook
+from decimal import Decimal
 import ring
 
 
@@ -46,6 +48,9 @@ class API(APIBase, client=Client):
         return parsed_data['result']
 
 
+def _flatten_orderbook(item):
+    return Decimal(item['Rate']), Decimal(item['Quantity'])
+
 
 class Currency(CurrencyImplBase, client=Client):
 
@@ -71,7 +76,10 @@ class Currency(CurrencyImplBase, client=Client):
 
     def orderbook(self):
         data = self.api.getorderbook(self._market)
-        return data
+        return Orderbook(
+            list(map(_flatten_orderbook, data['sell'])),
+            list(map(_flatten_orderbook, data['buy'])),
+        )
 
     def history(self):
         data = self.api.getmarkethistory(self._market)
