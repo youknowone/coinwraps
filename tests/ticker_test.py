@@ -53,3 +53,14 @@ def test_orderbook(client_name):
     bid = orderbook.bids[0]
     assert ask[0] > bid[0]
 
+
+@pytest.mark.parametrize('client_name', [
+    'poloniex',
+    'bittrex',
+])
+def test_history(client_name):
+    client = coinwraps.clients[client_name]
+    history = client.currency(('LTC', 'BTC')).history()
+    item1 = history[0]
+    item2 = history[1]
+    assert item1.filled_at > item2.filled_at

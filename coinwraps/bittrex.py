@@ -1,5 +1,5 @@
 from .base import ClientBase, APIBase, CurrencyImplBase
-from .typing import Orderbook
+from .typing import Orderbook, HistoryItem
 from decimal import Decimal
 import ring
 
@@ -33,7 +33,8 @@ class API(APIBase, client=Client):
 
     def getorderbook(self, market, type='both'):
         url = self.ORDERBOOK_URL
-        response = self.session.get(
+        response = self.session.original_request(
+            'get',
             url, params={'market': market, 'type': type})
         parsed_data = response.json()
         assert parsed_data['success'] is True, parsed_data
@@ -41,7 +42,8 @@ class API(APIBase, client=Client):
 
     def getmarkethistory(self, market, type='both'):
         url = self.MARKETHISTORY_URL
-        response = self.session.get(
+        response = self.session.original_request(
+            'get',
             url, params={'market': market})
         parsed_data = response.json()
         assert parsed_data['success'] is True, parsed_data
@@ -83,4 +85,8 @@ class Currency(CurrencyImplBase, client=Client):
 
     def history(self):
         data = self.api.getmarkethistory(self._market)
-        return data
+        return [HistoryItem(
+            i['Id'], i['TimeStamp'],
+            i['FillType'].upper(), i['OrderType'].upper(),
+            Decimal(i['Price']), Decimal(i['Quantity']), Decimal(i['Total']),
+        ) for i in data]

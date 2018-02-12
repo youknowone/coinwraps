@@ -56,6 +56,7 @@ class APIBase:
             response = original_request(*args, **kwargs)
             return response
 
+        self.session.original_request = self.session.request
         self.session.request = safe_request
 
 

@@ -33,6 +33,7 @@ setup(
         'attrs',
         'requests',
         'autobahn',
+        'ciso8601==1.0.7',
         'ring==0.6.1',
     ],
     tests_require=tests_require,

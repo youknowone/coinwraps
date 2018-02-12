@@ -1,5 +1,5 @@
 from .base import ClientBase, APIBase, CurrencyImplBase
-from .typing import Orderbook
+from .typing import Orderbook, HistoryItem
 from decimal import Decimal
 import ring
 
@@ -25,21 +25,24 @@ class API(APIBase, client=Client):
 
     def return_order_book(self, currency_pair, depth=10):
         url = self.PUBLIC_URL
-        response = self.session.get(
-            url, params={
+        response = self.session.original_request(
+            'get',
+            url,
+            params={
                 'command': 'returnOrderBook',
                 'currencyPair': currency_pair,
                 'depth': depth})
         parsed_data = response.json()
         return parsed_data
 
-    def return_trade_thistory(self, market, type='both'):
+    def return_trade_history(self, currency_pair, type='both'):
         url = self.PUBLIC_URL
-        response = self.session.get(
-            url, params={
+        response = self.session.original_request(
+            'get',
+            url,
+            params={
                 'command': 'returnTradeHistory',
-                'currencyPair': currency_pair,
-                'depth': depth})
+                'currencyPair': currency_pair})
         parsed_data = response.json()
         return parsed_data
 
@@ -73,5 +76,9 @@ class Currency(CurrencyImplBase, client=Client):
             [(Decimal(i[0]), Decimal(i[1])) for i in data['bids']])
 
     def history(self):
-        data = self.api.get_trade_history(self._currency_pair)
-        return data
+        data = self.api.return_trade_history(self._currency_pair)
+        return [HistoryItem(
+            f"{i['date']}-{i['rate']}-{i['amount']}", i['date'],
+            None, i['type'].upper(),
+            Decimal(i['rate']), Decimal(i['amount']), Decimal(i['total']),
+        ) for i in data]
