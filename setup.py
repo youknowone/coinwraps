@@ -32,7 +32,8 @@ setup(
     install_requires=[
         'attrs',
         'requests',
-        'ring==0.6.0',
+        'autobahn',
+        'ring==0.6.1',
     ],
     tests_require=tests_require,
     extras_require={

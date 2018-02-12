@@ -7,7 +7,7 @@ __all__ = 'CurrencyPair',
 
 clients = {}
 client_names = [
-    'korbit', 'bithumb', 'coinone', 'upbit']
+    'korbit', 'bithumb', 'coinone', 'upbit', 'bittrex']
 
 for client_name in client_names:
     module = importlib.import_module(f'coinwraps.{client_name}')
